@@ -1,7 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import icon from "../images/icon-location.svg";
-import { addTileLayer } from "./helpers";
+import { addTileLayer, validateIp } from "./helpers";
 
 export const IP_URL =
   "https://geo.ipify.org/api/v2/country?apiKey=at_PMr2hhHYvxhH6OA4YM5tGU9eSf5ps&ipAddress=";
@@ -31,14 +31,16 @@ btn.addEventListener("click", getData);
 ipInput.addEventListener("keydown", handleKey);
 
 function getData() {
-  // валидация данных
-  fetch(`${IP_URL}${ipInput.value}`)
-    .then((resp) => resp.json())
-    .then((data) => {
-      const { as, ip, isp, location } = data;
-      console.log(data);
-      fillInfo(ip, location.region, location.timezone, isp);
-    });
+  const ip = ipInput.value;
+
+  if (validateIp(ip)) {
+    fetch(`${IP_URL}${ip}`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        const { ip, isp, location } = data;
+        fillInfo(ip, location.region, location.timezone, isp);
+      });
+  }
 }
 
 function handleKey(event) {
